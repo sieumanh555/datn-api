@@ -3,10 +3,16 @@ const mongoose = require('mongoose');
 // const schema = mongoose.Schema;
 // const objectId = schema.ObjectId;
 
+const generateRandomId = () => Math.floor(1000 + Math.random() * 9000);
+
 const categorySchema = new mongoose.Schema({
-    id: { type: Number, required: true },
+    sku_id: { 
+        type: Number, 
+        default: generateRandomId,
+        unique: true,
+        required: false
+    },
     name: { type: String, required: true },
-    parentId: { type: String, required: false },
     status: { type: String, required: false }
 }, { timestamps: true });
 

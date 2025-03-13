@@ -22,9 +22,9 @@ async function updateCate(id, body) {
         if(!pro){
             throw new Error('Đếch thấy sản phẩm')
         }
-        const {name} = body
+        const {name, status} = body
         const result = await categoryModel.findByIdAndUpdate(id,
-            {name},
+            {name, status},
             {new: true}
         )
         return result
@@ -36,9 +36,10 @@ async function updateCate(id, body) {
 
 async function insert(body) {
     try {
-        const {name} = body;
+        const {name, status} = body;
         const cateNew = new categoryModel({
-            name
+            name,
+            status
         })
         const result = await cateNew.save() 
         return result
