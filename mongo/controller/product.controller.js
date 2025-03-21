@@ -12,30 +12,41 @@ module.exports = {
   getIdPro,
   getProductsByCategory,
   getProductByName,
+  getColor,
+  getSize,
+  increaseView,
+  getSizeColor,
+  getProductVariants
 };
 
 async function insert(body) {
   try {
-    const { name, price, pricePromo, mota, image, quantity, status, category, variants } = body;
+    const { name, price, pricePromo, hinhanh, mota, quantity, category, variants, location } = body;
 
     if (!name || !price || !category) {
       throw new Error("Thiếu thông tin bắt buộc: name, price hoặc category.");
     }
-
+  
     const categoryFind = await categoryModel.findById(category);
     if (!categoryFind) {
       throw new Error("Không tìm thấy danh mục.");
     }
-
+    const randomCode = 
+    Math.floor(1000 + Math.random() * 9000).toString() + // Random 4 số (1000 - 9999)
+    String.fromCharCode(65 + Math.floor(Math.random() * 26)) + // Random chữ cái A-Z
+    String.fromCharCode(65 + Math.floor(Math.random() * 26)) +
+    String.fromCharCode(65 + Math.floor(Math.random() * 26)) +
+    String.fromCharCode(65 + Math.floor(Math.random() * 26));
+  
     const proNew = new productModel({
-      sku_id: Math.floor(1000 + Math.random() * 9000).toString(), // Random mã 4 số
+      sku_id: randomCode,
       name,
       price,
       pricePromo: pricePromo || price, // Nếu không có, mặc định bằng price
       mota,
-      image: image || "",
+      hinhanh,
       quantity: quantity || 0, // Nếu không có, mặc định là 0
-      status: status || "available", // Nếu không có, mặc định là "available"
+      location,
       category: {
         categoryId: categoryFind._id,
         categoryName: categoryFind.name,
@@ -53,6 +64,7 @@ async function insert(body) {
         price: v.price,
         stock: v.stock,
         images: v.images || [],
+        status: v.status
       }));
 
       const insertedVariants = await productVariant.insertMany(variantDocs);
@@ -109,7 +121,7 @@ async function updatePro(id, body) {
       throw new Error("Không tìm thấy sản phẩm");
     }
 
-    const { name, price, pricePromo, mota, image, quantity, status, category, variants } = body;
+    const { name, price, pricePromo, mota, image, quantity, hot, view, status, category, variants } = body;
 
     // Cập nhật danh mục nếu có thay đổi
     let categoryUpdate = pro.category;
@@ -167,6 +179,8 @@ async function updatePro(id, body) {
         pricePromo: pricePromo !== undefined ? pricePromo : pro.pricePromo, // Nếu có giá KM thì cập nhật
         mota: mota || pro.mota,
         image: image || pro.image,
+        hot: hot || pro.hot,
+        view: view || pro.view,
         quantity: quantity !== undefined ? quantity : pro.quantity, // Nếu không có thì giữ nguyên
         status: status || pro.status,
         category: categoryUpdate,
@@ -181,11 +195,6 @@ async function updatePro(id, body) {
     throw error;
   }
 }
-
-
-
-
-
 async function deletePro(id) {
   try {
     const proDel = await productModel.findByIdAndDelete(id);
@@ -240,10 +249,66 @@ async function getProductByName(keyword) {
 
 async function getIdPro(id) {
   try {
-    const result = await productModel.findById(id);
+    const result = await productModel.findById(id).populate("variants");
     return result;
   } catch (error) {
     console.log(error);
+    throw error;
+  }
+}
+async function getProductVariants(id) {
+  try {
+    const result = await productVariant.findById(id);
+    return result;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+}
+
+
+async function getColor(size) {
+  try {
+    const result = await ProductVariant.find({ size }).distinct("color");
+    return result;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
+
+// Lấy danh sách size theo màu
+async function getSize(color) {
+  try {
+    const result = await ProductVariant.find({ color }).distinct("size");
+    return result;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
+
+// Lấy biến thể theo màu & size
+async function getSizeColor(color, size) {
+  try {
+    const result = await ProductVariant.findOne({ color, size });
+    return result;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
+
+async function increaseView(productId) {
+  try {
+    const product = await ProductVariant.findByIdAndUpdate(
+      productId,
+      { $inc: { views: 1 } },
+      { new: true }
+    );
+    return product;
+  } catch (error) {
+    console.error(error);
     throw error;
   }
 }

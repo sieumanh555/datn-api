@@ -4,6 +4,7 @@ const Schema = mongoose.Schema
 const ObjectId = Schema.ObjectId
 
 const newsSchema = new mongoose.Schema({
+    sku_id: { type: String, required: true },
     title: { type: String, required: true },
     content: { type: String, required: false },
     image: { type: String, required: false },

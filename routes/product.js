@@ -109,7 +109,16 @@ router.delete('/:id', async (req,res,next) => {
     return res.status(500).json({status:false, mess:'Lỗi hệ thống'})
   }
 })
-
+router.get('/:id/variants', async (req,res) => {
+  try {
+    const {id} = req.params
+    const result = await productController.getProductVariants(id)
+    return res.status(200).json({status:true, result, mess: 'Lấy thành công'})
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({status:false, mess:'Lỗi hệ thống'})
+  }
+});
 router.get('/:key/:value', async (req,res,next) => {
   try {
     const {key, value} = req.params
@@ -133,5 +142,51 @@ router.get('/:id', async (req,res,next) => {
   }
 });
 
+
+// Lấy danh sách màu theo size
+router.get("/colors/:size", async (req, res) => {
+  try {
+    const { size } = req.params;
+    const colors = await productController.getColor(size); // Truyền tham số size
+    res.json(colors);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Lấy danh sách size theo màu
+router.get("/sizes/:color", async (req, res) => {
+  try {
+    const { color } = req.params;
+    const sizes = await productController.getSize(color); // Truyền tham số color
+    res.json(sizes);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Lấy biến thể theo màu & size
+router.get("/variant/:color/:size", async (req, res) => {
+  try {
+    const { color, size } = req.params;
+    const variant = await productController.getSizeColor(color, size); // Truyền tham số color, size
+    if (!variant) return res.status(404).json({ message: "Không tìm thấy sản phẩm" });
+    res.json(variant);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.post("/view/:productId", async (req, res) => {
+  try {
+    const { productId } = req.params;
+    const updatedProduct = await productController.increaseView(productId);
+    if (!updatedProduct) return res.status(404).json({ message: "Sản phẩm không tồn tại" });
+
+    res.json({ message: "View đã được cập nhật", views: updatedProduct.views });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 module.exports = router;

@@ -1,5 +1,5 @@
 const categoryModel = require("../model/category/category.model");
-const newsModel = require("../model/news/news.model")
+const newsModel = require("../model/news/news.model");
 const { Error } = require("mongoose");
 
 module.exports = {
@@ -57,9 +57,14 @@ async function insertNews(body) {
     if (!categoryFind) {
       throw new Error("Không tìm thấy danh mục");
     }
+    const randomCode =
+      Array.from(
+        { length: 6 },
+        () => String.fromCharCode(65 + Math.floor(Math.random() * 26))
+      ).join("") + Math.floor(Math.random() * 10); 
 
-    // Tạo dữ liệu mới trong bảng news
     const newsNew = new newsModel({
+      sku_id: randomCode,
       title,
       content,
       image,

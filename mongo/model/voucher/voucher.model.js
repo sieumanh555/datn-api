@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 
 const voucherSchema = new mongoose.Schema(
   {
+    sku_id: { type: String, required: true },
     name: { type: String, required: true },
     code: { type: String, required: false },
     type: { type: String, required: false },

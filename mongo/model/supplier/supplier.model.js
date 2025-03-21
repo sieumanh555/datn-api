@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 // const objectId = schema.ObjectId;
 
 const supplierSchema = new mongoose.Schema({
+    sku_id: { type: String, required: true },
     name: { type: String, required: true },
     diachi: { type: String, required: false },
     numberphone: { type: String, required: false },

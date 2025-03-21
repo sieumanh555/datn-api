@@ -39,9 +39,14 @@ async function updateSupplier(id, body) {
 
 async function insertSupplier(body) {
     try {
-        const { name, diachi, numberphone, email, contactName, taxCode, type } = body;
+        const { name, diachi, numberphone, email, contactName, taxCode, type, status } = body;
+        const randomCode = Array.from({ length: 2 }, () => 
+            String.fromCharCode(65 + Math.floor(Math.random() * 26))
+        ).join('') + 
+        Math.floor(10000 + Math.random() * 90000);
 
         const supplierNew = new supplierModel({
+            sku_id: randomCode,
             name,
             diachi,
             numberphone,
@@ -49,6 +54,7 @@ async function insertSupplier(body) {
             contactName,
             taxCode,
             type,
+            status
         });
 
         const result = await supplierNew.save();

@@ -4,6 +4,7 @@ const schema = mongoose.Schema;
 const ObjectId = schema.ObjectId;
 
 const commentSchema = new mongoose.Schema({
+    sku_id: { type: String, required: true },
     user:{
         type:{
             userID: {type: ObjectId, required: true},

@@ -37,7 +37,12 @@ async function updateCate(id, body) {
 async function insert(body) {
     try {
         const {name, status} = body;
+        const randomCode = Math.floor(100 + Math.random() * 900).toString() + 
+                   String.fromCharCode(65 + Math.floor(Math.random() * 26)) + 
+                   String.fromCharCode(65 + Math.floor(Math.random() * 26));
+
         const cateNew = new categoryModel({
+            sku_id: randomCode,
             name,
             status
         })

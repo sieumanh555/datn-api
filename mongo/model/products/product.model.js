@@ -8,8 +8,13 @@ const productSchema = new Schema({
     price: { type: Number, required: true },
     pricePromo: { type: Number, required: true },
     mota: { type: String, required: false },
-    image: { type: String, required: false },
+    hinhanh: { type: String, required: true },
     quantity: { type: Number, required: true, default: 0 },
+    hot: { type: Number, required: true, default: 0 },
+    view: { type: Number, required: true, default: 0 },
+    rating: { type: Number, required: true, default: 0 },
+    sold: { type: Number, required: true, default: 0 },
+    location: { type: String, required: true},
     status: { type: String, required: false, default: "available" },
     category: {
         type: {

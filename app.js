@@ -1,3 +1,4 @@
+require('./mongo/config');
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
@@ -32,7 +33,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 
 app.use(cors({
-  origin: 'http://localhost:5000',
+  origin: 'http://localhost:3000',
   credentials: true 
 }));
 

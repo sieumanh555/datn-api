@@ -64,7 +64,16 @@ async function insertComment(body) {
         if (!userFind) {
             throw new Error("Không tìm thấy người dùng");
         }
+
+        const randomCode = Array.from({ length: 5 }, () => 
+          String.fromCharCode(65 + Math.floor(Math.random() * 26)) // Random từ 'A' - 'Z'
+        ).join('') + 
+        Array.from({ length: 3 }, () => 
+            Math.floor(Math.random() * 10) // Random số từ 0 - 9
+        ).join('');
+
         const commentNew = new commentsModel({
+            sky_id: randomCode,
             user: {
                 userID: userFind._id,
                 name: userFind.name,

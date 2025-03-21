@@ -19,7 +19,10 @@ async function deleteVoucher(id) {
 async function insertVoucher(body) {
     try {
         const { name, code, type, value, status } = body;
-        const voucherNew = new Voucher({ name, code, type, value, status });
+        const randomCode = Array.from({ length: 7 }, () => 
+            String.fromCharCode(65 + Math.floor(Math.random() * 26))
+        ).join('') + Math.floor(Math.random() * 10);
+        const voucherNew = new Voucher({ sku_id: randomCode, name, code, type, value, status });
         const result = await voucherNew.save();
         return result;
     } catch (error) {

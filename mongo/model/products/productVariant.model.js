@@ -8,7 +8,7 @@ const productVariantSchema = new Schema({
     color: { type: String, required: true },
     price: { type: Number, required: true },
     stock: { type: Number, required: true, default: 0 },
-    images: [{ type: String, required: false }]
+    images: [{ type: String, required: false }],
+    status: { type: String, required: true},
 });
-
 module.exports = mongoose.models.productVariant || mongoose.model('productVariant',productVariantSchema)
