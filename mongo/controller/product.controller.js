@@ -120,9 +120,7 @@ async function updatePro(id, body) {
     if (!pro) {
       throw new Error("Không tìm thấy sản phẩm");
     }
-
     const { name, price, pricePromo, mota, image, quantity, hot, view, status, category, variants } = body;
-
     // Cập nhật danh mục nếu có thay đổi
     let categoryUpdate = pro.category;
     if (category) {
@@ -136,23 +134,25 @@ async function updatePro(id, body) {
       };
     }
 
-    // Cập nhật từng variant nếu có
-    let updatedVariantIds = pro.variants;
+    let updatedVariantIds = [...pro.variants]; // Giữ lại danh sách cũ
     if (variants && variants.length > 0) {
-      updatedVariantIds = [];
-
       for (const variant of variants) {
-        const { _id, size, color, price, stock, images } = variant;
+        const { _id, size, color, price, stock, images, status } = variant;
 
         if (_id) {
           // Nếu variant đã có, cập nhật
           const updatedVariant = await productVariant.findByIdAndUpdate(
             _id,
-            { size, color, price, stock, images },
+            { size, color, price, stock, images, status },
             { new: true }
           );
           if (updatedVariant) {
-            updatedVariantIds.push(updatedVariant._id);
+            const index = updatedVariantIds.findIndex(v => v.toString() === _id);
+            if (index !== -1) {
+              updatedVariantIds[index] = updatedVariant._id;
+            } else {
+              updatedVariantIds.push(updatedVariant._id);
+            }
           }
         } else {
           // Nếu variant mới, tạo mới
@@ -163,6 +163,7 @@ async function updatePro(id, body) {
             price,
             stock,
             images,
+            status
           });
           const savedVariant = await newVariant.save();
           updatedVariantIds.push(savedVariant._id);

@@ -191,6 +191,8 @@ async function editUser(id, token, body) {
         const updateData = {};
         const fields = [
             "name",
+            "gender",
+            "birthday",
             "phone",
             "password",
             "email",
@@ -211,8 +213,35 @@ async function editUser(id, token, body) {
             updateData.password = bcrypt.hashSync(body.password, salt);
         }
 
-        await userModel.findByIdAndUpdate(id, updateData, {new: true});
-        return {status: 200, message: "Sửa thông tin user thành công"};
+        const updatedUser = await userModel.findByIdAndUpdate(id, updateData, {new: true});
+
+        const access_token = jwt.sign(
+            {
+                // userId: updatedUser._id,
+                // role: updatedUser.role
+                userInfo: updatedUser
+            },
+            config.secret_key,
+            {expiresIn: "3d"}
+        );
+
+        const refresh_token = jwt.sign(
+            {
+                // userId: updatedUser._id,
+                // role: updatedUser.role
+                userInfo: updatedUser
+            },
+            config.secret_key,
+            {expiresIn: "15d"}
+        );
+
+        return {
+            status: 200,
+            message: "Sửa thông tin user thành công",
+            access_token: access_token,
+            refresh_token: refresh_token,
+            user: updatedUser,
+        };
     } catch (error) {
         console.error(error);
         return {status: 500, message: "Sửa thông tin user thất bại"};
@@ -236,7 +265,6 @@ async function deleteUser(id, token) {
         } catch (error) {
             return {status: 403, message: "Mã xác thực không đúng"};
         }
-
         const user = await userModel.findById(id);
         if (!user) {
             return {status: 404, message: "Không tìm thấy tài khoản"};
@@ -286,5 +314,5 @@ async function refreshToken(token) {
             console.log(err);
             return {status: 403, mess: "refreshToken không hợp lệ"};
         }
-        }
+    }
 }
