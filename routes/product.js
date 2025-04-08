@@ -45,7 +45,17 @@ router.post('/', upload.single('image'), async (req,res) => {
     return res.status(500).json({status:false, mess:'Lỗi hệ thống'})
   }
 })
-
+router.post('/variant/:id', async (req,res) => {
+  try {
+    const body = req.body
+    const {id} = req.params
+    const proNew = await productController.insertVariants(id, body)
+    return res.status(200).json(proNew)
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({status:false, mess:'Lỗi hệ thống'})
+  }
+})
 router.get('/', async (req,res,next) => {
   try {
     const result = await productController.getProduct()
@@ -73,7 +83,17 @@ router.put('/:id', upload.single('image'), async (req,res,next) => {
     return res.status(500).json({status:false, mess:'Lỗi hệ thống'})
   }
 })
-
+router.put('/variant/:id', async (req,res,next) => {
+  try {
+    const {id} = req.params
+    const body = req.body
+    const proUpdate = await productController.updateVariant(id, body)
+    return res.status(200).json({status:true, proUpdate, mess: 'Cập nhật thành công'})
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({status:false, mess:'Lỗi hệ thống'})
+  }
+})
 router.get('/category=:id', async (req, res, next) => {
   try {
       const categoryId = req.params.id;
@@ -109,11 +129,21 @@ router.delete('/:id', async (req,res,next) => {
     return res.status(500).json({status:false, mess:'Lỗi hệ thống'})
   }
 })
+router.delete('/variant/:id', async (req,res,next) => {
+  try {
+    const {id} = req.params
+    const result = await productController.deleteVariant(id)
+    return res.status(200).json({status:true, result, mess: 'Xóa thành công'})
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({status:false, mess:'Lỗi hệ thống'})
+  }
+})
 router.get('/:id/variants', async (req,res) => {
   try {
     const {id} = req.params
     const result = await productController.getProductVariants(id)
-    return res.status(200).json({status:true, result, mess: 'Lấy thành công'})
+    return res.status(200).json(result)
   } catch (error) {
     console.log(error);
     return res.status(500).json({status:false, mess:'Lỗi hệ thống'})

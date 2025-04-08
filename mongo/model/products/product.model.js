@@ -15,7 +15,7 @@ const productSchema = new Schema({
     rating: { type: Number, required: true, default: 0 },
     sold: { type: Number, required: true, default: 0 },
     location: { type: String, required: true},
-    status: { type: String, required: false, default: "available" },
+    status: { type: String, required: false, default: "Đang xử lý" },
     category: {
         type: {
             categoryId: { type: ObjectId, required: true },

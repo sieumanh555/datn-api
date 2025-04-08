@@ -1,20 +1,30 @@
 const categoryModel = require('../model/category/category.model')
+const productModel = require('../model/products/product.model')
 const { Error } = require('mongoose')
 
 module.exports = {deleteCategory, getAllCategory, getIdCategory, insert, updateCate}
 
 async function deleteCategory(id) {
     try {
-        const proDel = await categoryModel.findByIdAndDelete(id)
-        if(!proDel){
-            throw new Error('Không tìm thấy sản phẩm')
-        }
-        return proDel
-    } catch (error) {
-        console.log(error);
-        throw error
+      // Kiểm tra xem có sản phẩm nào có categoryId này không
+      const products = await productModel.find({ 'category.categoryId': id });
+  
+      if (products.length > 0) {
+       throw new Error('Không thể xóa danh mục này vì có sản phẩm đang sử dụng.');
+      } 
+    const deletedCategory = await categoryModel.findByIdAndDelete(id);
+
+    if (!deletedCategory) {
+        throw new Error('Không tìm thấy danh mục');
     }
-}
+    console.log('Danh mục đã được xóa thành công');
+    return deletedCategory;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+  
 
 async function updateCate(id, body) {
     try {

@@ -2,6 +2,7 @@ const productModel = require("../model/products/product.model");
 const productVariant = require("../model/products//productVariant.model");
 const categoryModel = require("../model/category/category.model");
 const { Error } = require("mongoose");
+const productVariantModel = require("../model/products//productVariant.model");
 
 module.exports = {
   insert,
@@ -16,37 +17,42 @@ module.exports = {
   getSize,
   increaseView,
   getSizeColor,
+  insertVariants,
+  updateVariant,
+  deleteVariant,
   getProductVariants
 };
 
 async function insert(body) {
   try {
-    const { name, price, pricePromo, hinhanh, mota, quantity, category, variants, location } = body;
+    const { name, price, pricePromo, hinhanh, mota, quantity, category, status, location } = body;
 
     if (!name || !price || !category) {
       throw new Error("Thiếu thông tin bắt buộc: name, price hoặc category.");
     }
-  
+
     const categoryFind = await categoryModel.findById(category);
     if (!categoryFind) {
       throw new Error("Không tìm thấy danh mục.");
     }
-    const randomCode = 
-    Math.floor(1000 + Math.random() * 9000).toString() + // Random 4 số (1000 - 9999)
-    String.fromCharCode(65 + Math.floor(Math.random() * 26)) + // Random chữ cái A-Z
-    String.fromCharCode(65 + Math.floor(Math.random() * 26)) +
-    String.fromCharCode(65 + Math.floor(Math.random() * 26)) +
-    String.fromCharCode(65 + Math.floor(Math.random() * 26));
-  
+
+    const randomCode =
+      Math.floor(1000 + Math.random() * 9000).toString() + // 4 số
+      String.fromCharCode(65 + Math.floor(Math.random() * 26)) + // 4 chữ cái A-Z
+      String.fromCharCode(65 + Math.floor(Math.random() * 26)) +
+      String.fromCharCode(65 + Math.floor(Math.random() * 26)) +
+      String.fromCharCode(65 + Math.floor(Math.random() * 26));
+
     const proNew = new productModel({
       sku_id: randomCode,
       name,
       price,
-      pricePromo: pricePromo || price, // Nếu không có, mặc định bằng price
+      pricePromo: pricePromo || price,
       mota,
       hinhanh,
-      quantity: quantity || 0, // Nếu không có, mặc định là 0
+      quantity: quantity || 0,
       location,
+      status,
       category: {
         categoryId: categoryFind._id,
         categoryName: categoryFind.name,
@@ -54,26 +60,6 @@ async function insert(body) {
     });
 
     const savedProduct = await proNew.save();
-
-    // Nếu có biến thể (variants), thêm vào DB
-    if (variants && variants.length > 0) {
-      const variantDocs = variants.map((v) => ({
-        productId: savedProduct._id,
-        size: v.size,
-        color: v.color,
-        price: v.price,
-        stock: v.stock,
-        images: v.images || [],
-        status: v.status
-      }));
-
-      const insertedVariants = await productVariant.insertMany(variantDocs);
-
-      // Cập nhật danh sách biến thể vào sản phẩm
-      savedProduct.variants = insertedVariants.map((v) => v._id);
-      await savedProduct.save();
-    }
-
     return savedProduct;
   } catch (error) {
     console.log("Lỗi khi thêm sản phẩm:", error.message);
@@ -82,6 +68,38 @@ async function insert(body) {
 }
 
 
+async function insertVariants(id, body) {
+  try {
+    const pro = await productModel.findById(id);
+    if (!pro) {
+      throw new Error("Không tìm thấy sản phẩm");
+    }
+
+    const { variants } = body;
+    if (variants && variants.length > 0) {
+      const variantDocs = variants.map((v) => ({
+        productId: id,
+        size: v.size,
+        color: v.color,
+        price: v.price,
+        stock: v.stock,
+        images: v.images || [],
+        status: v.status,
+      }));
+
+      const insertedVariants = await productVariant.insertMany(variantDocs);
+
+      // Cộng dồn danh sách biến thể vào sản phẩm
+      pro.variants = [...(pro.variants || []), ...insertedVariants.map((v) => v._id)];
+      const savedProduct = await pro.save();
+      return savedProduct;
+    }
+    return pro;
+  } catch (error) {
+    console.log("Lỗi khi thêm biến thể:", error.message);
+    throw error;
+  }
+}
 
 async function getProduct() {
   try {
@@ -120,7 +138,8 @@ async function updatePro(id, body) {
     if (!pro) {
       throw new Error("Không tìm thấy sản phẩm");
     }
-    const { name, price, pricePromo, mota, image, quantity, hot, view, status, category, variants } = body;
+    const { name, price, pricePromo, mota, hinhanh, quantity, hot, view, status, category, variants } = body;
+
     // Cập nhật danh mục nếu có thay đổi
     let categoryUpdate = pro.category;
     if (category) {
@@ -134,65 +153,55 @@ async function updatePro(id, body) {
       };
     }
 
-    let updatedVariantIds = [...pro.variants]; // Giữ lại danh sách cũ
-    if (variants && variants.length > 0) {
-      for (const variant of variants) {
-        const { _id, size, color, price, stock, images, status } = variant;
-
-        if (_id) {
-          // Nếu variant đã có, cập nhật
-          const updatedVariant = await productVariant.findByIdAndUpdate(
-            _id,
-            { size, color, price, stock, images, status },
-            { new: true }
-          );
-          if (updatedVariant) {
-            const index = updatedVariantIds.findIndex(v => v.toString() === _id);
-            if (index !== -1) {
-              updatedVariantIds[index] = updatedVariant._id;
-            } else {
-              updatedVariantIds.push(updatedVariant._id);
-            }
-          }
-        } else {
-          // Nếu variant mới, tạo mới
-          const newVariant = new productVariant({
-            productId: id,
-            size,
-            color,
-            price,
-            stock,
-            images,
-            status
-          });
-          const savedVariant = await newVariant.save();
-          updatedVariantIds.push(savedVariant._id);
-        }
-      }
-    }
-
-    // Cập nhật sản phẩm
+    // Cập nhật thông tin sản phẩm chính
     const updatedProduct = await productModel.findByIdAndUpdate(
       id,
       {
         name: name || pro.name,
         price: price || pro.price,
-        pricePromo: pricePromo !== undefined ? pricePromo : pro.pricePromo, // Nếu có giá KM thì cập nhật
+        pricePromo: pricePromo !== undefined ? pricePromo : pro.pricePromo,
         mota: mota || pro.mota,
-        image: image || pro.image,
+        hinhanh: hinhanh || pro.hinhanh,
         hot: hot || pro.hot,
         view: view || pro.view,
-        quantity: quantity !== undefined ? quantity : pro.quantity, // Nếu không có thì giữ nguyên
+        quantity: quantity !== undefined ? quantity : pro.quantity,
         status: status || pro.status,
         category: categoryUpdate,
-        variants: updatedVariantIds, // Cập nhật danh sách variants mới
       },
       { new: true }
-    ).populate("variants"); // Lấy thông tin chi tiết của variants
+    );
 
-    return updatedProduct;
+    // Cập nhật variants
+    if (variants && variants.length > 0) {
+      updatedProduct.variants = await updateVariants(id, variants, pro.variants);
+      await updatedProduct.save(); // save the product to update the variant list.
+    }
+
+    return await productModel.findById(id).populate("variants"); // Lấy thông tin chi tiết của variants sau khi cập nhật
   } catch (error) {
     console.log("Lỗi khi cập nhật sản phẩm:", error.message);
+    throw error;
+  }
+}
+async function updateVariant(id, body) {
+  try {
+    // Tìm variant theo id
+    const variant = await productVariant.findById(id);
+    if (!variant) {
+      throw new Error("Không tìm thấy Variant");
+    }
+
+    // Cập nhật dữ liệu variant
+    const { size, color, price, stock, images, status } = body;
+    const updatedVariant = await productVariant.findByIdAndUpdate(
+      id,
+      { size, color, price, stock, images, status },
+      { new: true }
+    );
+
+    return updatedVariant;
+  } catch (error) {
+    console.log("Lỗi khi cập nhật variant:", error.message);
     throw error;
   }
 }
@@ -208,7 +217,18 @@ async function deletePro(id) {
     throw error;
   }
 }
-
+async function deleteVariant(id) {
+  try {
+    const proDel = await productVariantModel.findByIdAndDelete(id);
+    if (!proDel) {
+      throw new Error("Không tìm thấy sản phẩm");
+    }
+    return proDel;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+}
 async function getByKey(key, value) {
   try {
     const result = await productModel.findOne({ [key]: value });
@@ -266,8 +286,6 @@ async function getProductVariants(id) {
     throw error;
   }
 }
-
-
 async function getColor(size) {
   try {
     const result = await ProductVariant.find({ size }).distinct("color");

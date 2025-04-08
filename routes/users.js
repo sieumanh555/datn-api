@@ -16,8 +16,6 @@ router.get("/", async (req, res) => {
             .json({status: 500, message: "Lỗi server"});
     }
 });
-
-
 router.get("/getemployee", async (req, res) => {
     try {
         const result = await userController.getEmployee();

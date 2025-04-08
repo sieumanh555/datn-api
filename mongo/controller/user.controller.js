@@ -166,21 +166,21 @@ async function login(body) {
 
 async function editUser(id, token, body) {
     try {
-        if (!token) {
-            return {status: 401, message: "Không tìm thấy mã xác thực"};
-        }
+        // if (!token) {
+        //     return {status: 401, message: "Không tìm thấy mã xác thực"};
+        // }
 
-        const tokenParts = token.split(" ");
-        if (tokenParts.length !== 2 || tokenParts[0] !== "Bearer") {
-            return {status: 400, message: "Token không hợp lệ"};
-        }
+        // const tokenParts = token.split(" ");
+        // if (tokenParts.length !== 2 || tokenParts[0] !== "Bearer") {
+        //     return {status: 400, message: "Token không hợp lệ"};
+        // }
 
-        let verifyToken;
-        try {
-            verifyToken = jwt.verify(tokenParts[1], config.secret_key);
-        } catch (error) {
-            return {status: 403, message: "Mã xác thực không đúng"};
-        }
+        // let verifyToken;
+        // try {
+        //     verifyToken = jwt.verify(tokenParts[1], config.secret_key);
+        // } catch (error) {
+        //     return {status: 403, message: "Mã xác thực không đúng"};
+        // }
 
         const user = await userModel.findById(id);
         if (!user) {
@@ -190,7 +190,8 @@ async function editUser(id, token, body) {
         // Chỉ update những field có giá trị
         const updateData = {};
         const fields = [
-            "name",
+            "firstname",
+            "lastname",
             "gender",
             "birthday",
             "phone",
@@ -212,9 +213,7 @@ async function editUser(id, token, body) {
             const salt = bcrypt.genSaltSync(10);
             updateData.password = bcrypt.hashSync(body.password, salt);
         }
-
         const updatedUser = await userModel.findByIdAndUpdate(id, updateData, {new: true});
-
         const access_token = jwt.sign(
             {
                 // userId: updatedUser._id,
@@ -224,7 +223,6 @@ async function editUser(id, token, body) {
             config.secret_key,
             {expiresIn: "3d"}
         );
-
         const refresh_token = jwt.sign(
             {
                 // userId: updatedUser._id,
@@ -234,7 +232,6 @@ async function editUser(id, token, body) {
             config.secret_key,
             {expiresIn: "15d"}
         );
-
         return {
             status: 200,
             message: "Sửa thông tin user thành công",
