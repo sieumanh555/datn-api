@@ -38,7 +38,7 @@ app.use(cors({
 }));
 
 
-mongoose.connect('mongodb://localhost:27017/project')
+mongoose.connect(process.env.MONGO_URI)
 .then(() => console.log(' 🚀 Ket noi thanh cong'))
 .catch(err => console.log('❌ Ket noi that bai', err));
 
