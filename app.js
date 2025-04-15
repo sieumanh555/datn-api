@@ -18,7 +18,6 @@ var newsRouter = require('./routes/news');
 var supplierRouter = require('./routes/supplier');
 var voucherRouter = require('./routes/voucher');
 var commentsRouter = require('./routes/comments');
-
 var app = express();
 
 // view engine setup
@@ -42,6 +41,7 @@ if (!process.env.MONGO_URI) {
   process.exit(1);
 }
 mongoose.connect(process.env.MONGO_URI)
+// mongoose.connect('mongodb://localhost:27017/project')
 .then(() => console.log(' 🚀 Ket noi thanh cong'))
 .catch(err => console.log('❌ Ket noi that bai', err));
 
@@ -53,6 +53,7 @@ app.use('/news', newsRouter);
 app.use('/supplier', supplierRouter);
 app.use('/comments', commentsRouter);
 app.use('/voucher', voucherRouter);
+
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
