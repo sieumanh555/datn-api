@@ -66,16 +66,6 @@ router.post("/login", async (req, res) => {
         return res.status(500).json({status: false, mess: "Đăng nhập thất bại"});
     }
 });
-router.post("/admin/login", async (req, res) => {
-    try {
-        const body = req.body;
-        const result = await userController.loginAdmin(body);
-        return res.status(result.status).json(result);
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({status: false, mess: "Đăng nhập thất bại"});
-    }
-});
 // PUT: url/users/:id
 router.put("/:id", async (req, res) => {
     try {
@@ -129,5 +119,14 @@ router.post("/refreshToken", async (req, res) => {
             .json({status: false, mess: "Refresh token thất bại"});
     }
 });
-
+router.post("/admin/login", async (req, res) => {
+    try {
+        const body = req.body;
+        const result = await userController.loginAdmin(body);
+        return res.status(result.status).json(result);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({status: false, mess: "Đăng nhập thất bại"});
+    }
+});
 module.exports = router;

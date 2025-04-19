@@ -174,7 +174,7 @@ async function loginAdmin(body) {
             return {status: 401, message: "Email hoặc mật khẩu không đúng"};
         }
         if (user.role === 0) {
-            return res.status(403).json({ message: 'Tài khoản khách hàng không được phép đăng nhập ở đây' });
+            return { status: 403, message: 'Tài khoản khách hàng không được phép đăng nhập ở đây' };
         }
         const matchPass = bcrypt.compareSync(password, user.password);
         if (matchPass) {
