@@ -12,6 +12,7 @@ module.exports = {
     deleteUser,
     getEmployee,
     refreshToken,
+    loginAdmin,
 };
 
 async function getUsers() {
@@ -163,7 +164,51 @@ async function login(body) {
         return {status: 500, mess: "Lỗi server"};
     }
 }
+async function loginAdmin(body) {
+    try {
+        const {email, password} = body;
 
+        const user = await userModel.findOne({email: email});
+
+        if (!user) {
+            return {status: 401, message: "Email hoặc mật khẩu không đúng"};
+        }
+        if (user.role === 0) {
+            return res.status(403).json({ message: 'Tài khoản khách hàng không được phép đăng nhập ở đây' });
+        }
+        const matchPass = bcrypt.compareSync(password, user.password);
+        if (matchPass) {
+            const access_token = jwt.sign(
+                {
+                    userInfo: user,
+                },
+                config.secret_key,
+                {expiresIn: "3d"}
+            );
+
+            const refresh_token = jwt.sign(
+                {
+                    userInfo: user,
+                },
+                config.secret_key,
+                {expiresIn: "15d"}
+            );
+
+            return {
+                status: 200,
+                message: "Đăng nhập thành công",
+                access_token: access_token,
+                refresh_token: refresh_token,
+                user: user,
+            };
+        } else {
+            return {status: 401, mess: "Email hoặc mật khẩu không đúng"};
+        }
+    } catch (error) {
+        console.log(error);
+        return {status: 500, mess: "Lỗi server"};
+    }
+}
 async function editUser(id, token, body) {
     try {
         // if (!token) {
