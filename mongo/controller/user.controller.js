@@ -50,6 +50,7 @@ async function register(body) {
     try {
         const {  
             firstname, 
+            name,
             lastname, 
             phone, 
             password, 
@@ -86,6 +87,7 @@ async function register(body) {
             phone, 
             password: hash, 
             email, 
+            name,
             image,
             address, 
             gender,       // Thêm gender
@@ -236,6 +238,7 @@ async function editUser(id, token, body) {
         const updateData = {};
         const fields = [
             "firstname",
+            "name",
             "lastname",
             "gender",
             "birthday",
