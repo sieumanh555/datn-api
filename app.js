@@ -32,7 +32,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 
 app.use(cors({
-  origin: ['http://103.20.96.47:3000', 'http://localhost:3000'],
+  origin: ['http://103.20.96.47:3000', 'http://localhost:3000', "https://datn-admin-kn1bc1q2g-sieumanh555s-projects.vercel.app"],
   credentials: true 
 }));
 
