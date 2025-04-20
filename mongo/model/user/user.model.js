@@ -4,9 +4,9 @@ const ObjectId = Schema.ObjectId;
 
 const userSchema = new Schema({
   kyc_id: {type : String, required: true},
-  firstname: { type: String, required: true },
+  firstname: { type: String, required: false },
   name: { type: String, required: true },
-  lastname: { type: String, required: true },
+  lastname: { type: String, required: false },
   phone: { type: String, required: false },
   password: { type: String, required: true },
   email: { type: String, required: true },
