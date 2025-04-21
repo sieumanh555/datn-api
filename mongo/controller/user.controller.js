@@ -13,6 +13,7 @@ module.exports = {
     getEmployee,
     refreshToken,
     loginAdmin,
+    getNewUsers
 };
 
 async function getUsers() {
@@ -24,7 +25,18 @@ async function getUsers() {
         return {status: 404, message: "Lỗi fetching users"};
     }
 }
-
+async function getNewUsers() {
+    try {
+        const users = await userModel
+            .find({ role: 0 })
+            .sort({ createdAt: -1 }) // Sắp xếp mới nhất
+            .limit(10); // Lấy 10 bản ghi
+        return users;
+    } catch (error) {
+        console.log(error);
+        return { status: 404, message: "Lỗi fetching users" };
+    }
+}
 
 async function getEmployee() {
     try {

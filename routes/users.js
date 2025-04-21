@@ -16,6 +16,17 @@ router.get("/", async (req, res) => {
             .json({status: 500, message: "Lỗi server"});
     }
 });
+router.get("/newuser", async (req, res) => {
+    try {
+        const result = await userController.getNewUsers();
+        return res.json(result);
+    } catch (error) {
+        console.error(error);
+        return res
+            .status(500)
+            .json({status: 500, message: "Lỗi server"});
+    }
+});
 router.get("/getemployee", async (req, res) => {
     try {
         const result = await userController.getEmployee();
