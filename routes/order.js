@@ -1,47 +1,74 @@
-// var express = require('express');
-// var router = express.Router();
-// const jwt = require('jsonwebtoken');
-// const middlewareController = require('../mongo/middlewareController');
+var express = require("express");
+var router = express.Router();
 
-// router.post('/order', function (req, res) {
-//     const {item, description, amount} = req.body;
-//     const currentDate = dayjs();
-//     const app_time = currentDate.valueOf();
-//     const tranId = currentDate.format('YYMMDD');
-//     const app_trans_id = `${tranId}_${app_time}`;
-//     const key1 = "PcY4iZIKFCIdgZvA6ueMcMHHUbRLYjPL";
-//     const data = {
-//         "amount": amount,
-//         "app_id": 2553,
-//         "app_time": app_time,
-//         "app_trans_id": app_trans_id,
-//         "app_user": "demo",
-//         "bank_code": "zalopayapp",
-//         "description": description,
-//         "embed_data": JSON.stringify({}),
-//         "item": JSON.stringify(items),
-//         "key1": key1,
-//         "mac": ""
-//     }
-//     // hmac_input: 2553|220817_1660717311101|ZaloPayDemo|10000|1660717311101|{}|[]
-//     // mac: cf0ff27956f4d6203ce4a2c55691d81b65de2d640ee65e95ae5627ce801cd962
-//     const hmac_input = `${data.app_id}|${data.app_trans_id}| ${data.app_user}|${data.amount}|${data.app_time}|${data.embed_data}|${data.item}`;
-//     const mac = crypto.createHmac('sha256', key1).update(hmac_input).digest('hex');
+const orderController = require("../mongo/controller/oder.controller");
 
-//     data.mac = mac;
+router.get("/", async (req, res) => {
+    try {
+        const result = await orderController.getAll();
+        return res.status(result.status).json(result);
+    } catch (error) {
+        console.log("Lỗi server: ", error);
+        return res.status(500).json({status: 500, message: "lỗi server"})
+    }
+});
 
-//     request({
-//         url: "https://sb-openapi.zalopay.vn/v2/create",
-//         method: "POST",
-//         json: true,
-//         body: data
-//     }, function(error, response, body){
-//         if(body.return_code === 1){
-//             console.log("Body: ", body);
-//             res.send(body)
-//         } else {
-//             res.status(500).send(body);
-//         }
-//     })
-// })
+router.get("/:id", async (req,res)=>{
+    try{
+        const {id} = req.params;
+        const result = await orderController.getOrderById(id);
+        return res.status(result.status).json(result);
+    } catch(error){
+        console.log("Lỗi server: ",error);
+        return res.status(500).json({status: 500, message: "Lỗi sever"});
 
+    }
+})
+
+router.get("/uniqueKey/:key", async (req,res)=>{
+    try{
+        const {key} = req.params;
+        const result = await orderController.getOrderByUniqueKey(key);
+        return res.status(result.status).json(result);
+    } catch(error){
+        console.log("Lỗi server: ",error);
+        return res.status(500).json({status: 500, message: "Lỗi sever"});
+
+    }
+})
+
+router.post("/", async (req, res) => {
+    try {
+        const body = req.body;
+        const result = await orderController.addOrder(body);
+        return res.status(result.status).json(result);
+    } catch (error) {
+        console.log("Lỗi server: ", error);
+        return res.status(500).json({status: 500, message: "lỗi server"})
+    }
+})
+
+router.put("/:id", async (req, res) => {
+    try {
+        const {id} = req.params;
+        const body = req.body;
+        const result = await orderController.editOrder(id, body);
+        return res.status(result.status).json(result);
+    } catch (error) {
+        console.log("Lỗi server: ", error);
+        return res.status(400).json({status: 400, message: error.message})
+    }
+})
+
+router.post("/user/:id", async (req, res) => {
+    try {
+        const {id} = req.params;
+        const result = await orderController.findOrdersByUser(id);
+        return res.status(result.status).json(result);
+    } catch (error) {
+        console.log("Lỗi server: ", error);
+        return res.status(500).json({status: 500, message: "lỗi server"})
+    }
+})
+
+module.exports = router;

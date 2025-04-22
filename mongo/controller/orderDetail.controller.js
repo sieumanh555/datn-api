@@ -1,4 +1,4 @@
-const orderDetailModel = require("../models/orderDetail.model");
+const orderDetailModel = require("../model/order/orderDetail.model");
 
 
 module.exports = {
@@ -30,8 +30,8 @@ async function getOrderDetailById(id) {
 
 async function addOrderDetail(items) {
     try {
-        const orderDetail = new orderDetailModel({items});
-
+        const orderDetail = new orderDetailModel(items);
+        
         await orderDetail.save();
 
         return {status: 200, message: "thêm orderDetail thành công", data: orderDetail}

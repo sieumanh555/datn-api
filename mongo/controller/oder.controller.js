@@ -1,13 +1,18 @@
-const orderModel = require("../models/order.model");
-const userModel = require("../models/user.model");
+const getOrderModel  = require("../model/order/order.model");
+const userModel = require("../model/user/user.model");
 module.exports = {
     getAll,
     getOrderById,
+    getOrderByUniqueKey,
     addOrder,
     editOrder,
     findOrdersByUser
 };
+let orderModel;
 
+(async () => {
+    orderModel = await getOrderModel();
+})();
 async function getAll() {
     try {
         const orders = await orderModel.find().sort({_id: -1}).populate("userId").populate("orderDetailId");
@@ -17,26 +22,60 @@ async function getAll() {
         return {status: 500, message: "Lỗi fetch data orders"}
     }
 }
+
 async function getOrderById(id) {
     try {
-        const order = await orderModel.find({_id: id}).sort({_id: -1}).populate("userId", "name").populate("orderDetailId");
+        const order = await orderModel.findOne({_id: id}).sort({_id: -1}).populate("userId", "name").populate("orderDetailId");
 
         return {status: 200, message: "Lấy dữ liệu đơn hàng theo id thành công", data: order};
     } catch (error) {
         console.log(error);
-        return {status: 500, message: "Lỗi lấy dữ liệu đơn hàng", data: orders};
+        return {status: 500, message: "Lỗi lấy dữ liệu đơn hàng"};
+    }
+}
+
+async function getOrderByUniqueKey(uniqueKey) {
+    try {
+        const order = await orderModel.findOne({uniqueKey: uniqueKey}).populate("userId", "name").populate("orderDetailId");
+        return {status: 200, message: "Lấy dữ liệu đơn hàng theo uniqueKey thành công", data: order};
+    } catch (error) {
+        console.log(error);
+        return {status: 500, message: "Lỗi lấy dữ liệu đơn hàng theo uniqueKey"};
     }
 }
 
 async function addOrder(body) {
     try {
-        const {userId, orderDetailId, amount, status} = body;
+        const {
+            userId,
+            orderDetailId,
+            amount,
+            description,
+            voucherId,
+            voucherValue,
+            address,
+            paymentMethod,
+            paymentStatus,
+            shipping,
+            shippingMethod,
+            status
+        } = body;
+
         const order = new orderModel({
             userId,
             orderDetailId,
             amount,
+            description,
+            voucherId,
+            voucherValue,
+            address,
+            paymentMethod,
+            paymentStatus,
+            shipping,
+            shippingMethod,
             status
         });
+        console.log(order);
         await order.save();
         return {status: 200, message: "Thêm order thành công", data: order}
     } catch (error) {
@@ -47,15 +86,36 @@ async function addOrder(body) {
 
 async function editOrder(id, body) {
     try {
-        const {userId, OrderDetailId, amount, status} = body;
+        const {
+            userId,
+            orderDetailId,
+            amount,
+            description,
+            voucherId,
+            voucherValue,
+            address,
+            paymentMethod,
+            paymentStatus,
+            shipping,
+            shippingMethod,
+            status
+        } = body;
         const order = await orderModel.findById(id);
         if (!order) {
             return {status: 404, message: "Không tìm thấy đơn hàng"};
         }
         const updatedOrder = await orderModel.findByIdAndUpdate(id, {
             userId,
-            OrderDetailId,
+            orderDetailId,
             amount,
+            description,
+            voucherId,
+            voucherValue,
+            address,
+            paymentMethod,
+            paymentStatus,
+            shipping,
+            shippingMethod,
             status
         }, {new: true});
         return {status: 200, message: "Sửa order thành công", data: updatedOrder}

@@ -9,6 +9,8 @@ const cors = require('cors');
 require('./mongo/model/category/category.model')
 require('./mongo/model/products/product.model')
 require('./mongo/model/user/user.model')
+require('./mongo/model/order/order.model')
+require('./mongo/model/order/orderDetail.model')
 
 var indexRouter = require('./routes/index');
 var productRouter = require('./routes/product');
@@ -18,6 +20,9 @@ var newsRouter = require('./routes/news');
 var supplierRouter = require('./routes/supplier');
 var voucherRouter = require('./routes/voucher');
 var commentsRouter = require('./routes/comments');
+var orderRouter = require('./routes/order');
+var orderDetailsRouter = require('./routes/odrdetails');
+
 var app = express();
 
 // view engine setup
@@ -53,6 +58,8 @@ app.use('/news', newsRouter);
 app.use('/supplier', supplierRouter);
 app.use('/comments', commentsRouter);
 app.use('/voucher', voucherRouter);
+app.use('/order', orderRouter);
+app.use('/orderDetails', orderDetailsRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
