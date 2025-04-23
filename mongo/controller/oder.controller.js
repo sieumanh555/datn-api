@@ -6,7 +6,8 @@ module.exports = {
     getOrderByUniqueKey,
     addOrder,
     editOrder,
-    findOrdersByUser
+    findOrdersByUser,
+    getAllOrderFailed
 };
 let orderModel;
 
@@ -15,11 +16,25 @@ let orderModel;
 })();
 async function getAll() {
     try {
-        const orders = await orderModel.find().sort({_id: -1}).populate("userId").populate("orderDetailId");
+        const orders = await orderModel.find().sort({_id: -1}).populate("userId").populate("orderDetailId").populate("voucherId");
         return {status: 200, message: "fetch data orders thành công", data: orders}
     } catch (error) {
         console.log("Lỗi fetch data orders: ", error);
         return {status: 500, message: "Lỗi fetch data orders"}
+    }
+}
+async function getAllOrderFailed() {
+    try {
+        const orders = await orderModel.find({ status: "Processing" }) // Lọc theo trạng thái "Processing"
+            .sort({ _id: -1 }) // Sắp xếp theo thứ tự giảm dần của _id
+            .populate("userId") // Lấy thông tin người dùng
+            .populate("orderDetailId") // Lấy thông tin chi tiết đơn hàng
+            .populate("voucherId"); // Lấy thông tin voucher
+
+        return { status: 200, message: "fetch data orders thành công", data: orders };
+    } catch (error) {
+        console.log("Lỗi fetch data orders: ", error);
+        return { status: 500, message: "Lỗi fetch data orders" };
     }
 }
 
