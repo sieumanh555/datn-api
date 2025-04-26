@@ -294,32 +294,37 @@ async function editUser(id, token, body) {
 async function deleteUser(id, token) {
     try {
         if (!token) {
-            return {status: 401, message: "Không tìm thấy mã xác thực"};
+            return { status: 401, message: "Không tìm thấy mã xác thực" };
         }
 
-        const tokenParts = token.split(" ");
-        if (tokenParts.length !== 2 || tokenParts[0] !== "Bearer") {
-            return {status: 403, message: "Mã xác thực không hợp lệ"};
+        const [scheme, jwtToken] = token.split(" ");
+        if (scheme !== "Bearer" || !jwtToken) {
+            return { status: 403, message: "Mã xác thực không hợp lệ" };
         }
 
         let decoded;
+
         try {
-            decoded = jwt.verify(tokenParts[1], config.secret_key);
+            decoded = jwt.verify(jwtToken, config.secret_key);
         } catch (error) {
-            return {status: 403, message: "Mã xác thực không đúng"};
+            return { status: 403,error, message: "Mã xác thực không đúng" };
         }
-        const user = await userModel.findById(id);
-        if (!user) {
-            return {status: 404, message: "Không tìm thấy tài khoản"};
+        if (decoded.role !== "admin" && decoded.userId !== id) {
+            return { status: 403, message: "Không có quyền xóa tài khoản này" };
         }
 
-        await userModel.findByIdAndDelete(id);
-        return {status: 200, message: "Xóa tài khoản thành công"};
+        const user = await userModel.findByIdAndDelete(id);
+        if (!user) {
+            return { status: 404, message: "Không tìm thấy tài khoản" };
+        }
+
+        return { status: 200, message: "Xóa tài khoản thành công" };
     } catch (error) {
         console.error(error);
-        return {status: 500, message: "Xóa tài khoản thất bại"};
+        return { status: 500, message: "Xóa tài khoản thất bại" };
     }
 }
+
 
 async function refreshToken(token) {
     if (!token) {

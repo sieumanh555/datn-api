@@ -7,6 +7,7 @@ module.exports = {
     addOrder,
     editOrder,
     findOrdersByUser,
+    getAllTodayOrders,
     getAllOrderFailed
 };
 let orderModel;
@@ -23,6 +24,27 @@ async function getAll() {
         return {status: 500, message: "Lỗi fetch data orders"}
     }
 }
+async function getAllTodayOrders() {
+    try {
+      // Tính khoảng thời gian từ đầu ngày tới cuối ngày hôm nay
+      const startOfDay = new Date();
+      startOfDay.setHours(0, 0, 0, 0); // 00:00:00
+  
+      const endOfDay = new Date();
+      endOfDay.setHours(23, 59, 59, 999); // 23:59:59
+  
+      // Tìm đơn hàng có createdAt trong khoảng hôm nay
+      const orders = await orderModel.find({
+        createdAt: { $gte: startOfDay, $lte: endOfDay }
+      }).sort({ _id: -1 });
+  
+      return { status: 200, message: "Fetch orders today thành công", data: orders };
+    } catch (error) {
+      console.log("Lỗi fetch orders today: ", error);
+      return { status: 500, message: "Lỗi fetch orders today" };
+    }
+  }
+  
 async function getAllOrderFailed() {
     try {
         const orders = await orderModel.find({ status: "Processing" }) // Lọc theo trạng thái "Processing"
