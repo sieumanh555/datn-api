@@ -94,16 +94,9 @@ async function register(body) {
         const hash = bcrypt.hashSync(password, salt);
         user = new userModel({
             kyc_id: randomCode,       // Thêm kyc_id
-            firstname,    // Thêm firstname
-            lastname,     // Thêm lastname
-            phone, 
             password: hash, 
             email, 
-            name,
-            image,
-            address, 
-            gender,       // Thêm gender
-            birthday,     // Thêm birthday       // role có giá trị mặc định nhưng vẫn có thể truyền vào
+            name
           });
         await user.save();
         const access_token = jwt.sign(
