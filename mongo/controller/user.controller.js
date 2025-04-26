@@ -61,16 +61,9 @@ async function getUserById(id) {
 async function register(body) {
     try {
         const {  
-            firstname, 
             name,
-            lastname, 
-            phone, 
             password, 
-            email, 
-            address, 
-            gender, 
-            image,
-            birthday,  
+            email,
           } = body;
 
         let user = await userModel.findOne({email: email});
