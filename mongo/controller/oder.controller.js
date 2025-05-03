@@ -29,7 +29,7 @@ async function getAll() {
 async function getTotal() {
     try {
         const revenue = await orderModel.aggregate([
-            { $match: { paymentStatus: "Completed" } }, // sửa chỗ này
+            { $match: { status: "Shipped" } }, // sửa chỗ này
             { $group: { _id: null, totalRevenue: { $sum: "$amount" } } }
         ]);
         return { status: 200, message: "Lấy orders thành công", data: revenue };
@@ -49,7 +49,7 @@ async function getTotalADay() {
       const revenue = await orderModel.aggregate([
         {
           $match: {
-            paymentStatus: "Completed",
+            status: "Shipped",
             createdAt: { $gte: startOfDay, $lte: endOfDay },
           },
         },

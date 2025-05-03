@@ -25,7 +25,7 @@ module.exports = async () => {
         shippingMethod: { type: String, required: false },
         status: {
             type: String,
-            enum: ["Processing", "Shipped", "Delivered", "Cancelled"],
+            enum: ["Processing", "Shipped", "Shipping", "Cancelled"],
             default: "Processing",
         },
     }, { timestamps: true });
