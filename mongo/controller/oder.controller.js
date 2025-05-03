@@ -8,7 +8,9 @@ module.exports = {
     editOrder,
     findOrdersByUser,
     getAllTodayOrders,
-    getAllOrderFailed
+    getAllOrderFailed,
+    getTotalADay,
+    getTotal
 };
 let orderModel;
 
@@ -18,12 +20,61 @@ let orderModel;
 async function getAll() {
     try {
         const orders = await orderModel.find().sort({_id: -1}).populate("userId").populate("orderDetailId").populate("voucherId");
-        return {status: 200, message: "fetch data orders thành công", data: orders}
+        return {status: 200, message: "Lấy orders thành công", data: orders}
     } catch (error) {
         console.log("Lỗi fetch data orders: ", error);
         return {status: 500, message: "Lỗi fetch data orders"}
     }
 }
+async function getTotal() {
+    try {
+        const revenue = await orderModel.aggregate([
+            { $match: { paymentStatus: "Completed" } }, // sửa chỗ này
+            { $group: { _id: null, totalRevenue: { $sum: "$amount" } } }
+        ]);
+        return { status: 200, message: "Lấy orders thành công", data: revenue };
+    } catch (error) {
+        console.log("Lỗi fetch data orders: ", error);
+        return { status: 500, message: "Lỗi fetch data orders" };
+    }
+}
+async function getTotalADay() {
+    try {
+      const startOfDay = new Date();
+      startOfDay.setHours(0, 0, 0, 0); // 00:00:00
+  
+      const endOfDay = new Date();
+      endOfDay.setHours(23, 59, 59, 999); // 23:59:59
+  
+      const revenue = await orderModel.aggregate([
+        {
+          $match: {
+            paymentStatus: "Completed",
+            createdAt: { $gte: startOfDay, $lte: endOfDay },
+          },
+        },
+        {
+          $group: {
+            _id: null,
+            totalRevenue: { $sum: "$amount" },
+          },
+        },
+      ]);
+  
+      return {
+        status: 200,
+        message: "Fetch data orders thành công",
+        data: revenue[0]?.totalRevenue || 0,
+      };
+    } catch (error) {
+      console.log("Lỗi fetch data orders: ", error);
+      return {
+        status: 500,
+        message: "Lỗi fetch data orders",
+      };
+    }
+  }
+  
 async function getAllTodayOrders() {
     try {
       // Tính khoảng thời gian từ đầu ngày tới cuối ngày hôm nay

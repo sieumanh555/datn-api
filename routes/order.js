@@ -21,6 +21,24 @@ router.get("/orderfailed", async (req, res) => {
         return res.status(500).json({status: 500, message: "lỗi server"})
     }
 });
+router.get("/ordertotaladay", async (req, res) => {
+    try {
+        const result = await orderController.getTotalADay();
+        return res.status(result.status).json(result);
+    } catch (error) {
+        console.log("Lỗi server: ", error);
+        return res.status(500).json({status: 500, message: "lỗi server"})
+    }
+});
+router.get("/ordertotal", async (req, res) => {
+    try {
+        const result = await orderController.getTotal();
+        return res.status(result.status).json(result);
+    } catch (error) {
+        console.log("Lỗi server: ", error);
+        return res.status(500).json({status: 500, message: "lỗi server"})
+    }
+});
 router.get("/orderday", async (req, res) => {
     try {
         const result = await orderController.getAllTodayOrders();
