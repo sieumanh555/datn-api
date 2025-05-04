@@ -113,7 +113,7 @@ async function getAllOrderFailed() {
 
 async function getOrderById(id) {
     try {
-        const order = await orderModel.findOne({_id: id}).sort({_id: -1}).populate("userId", "name").populate("orderDetailId");
+        const order = await orderModel.findOne({_id: id}).sort({_id: -1}).populate("userId"). populate("orderDetailId")
 
         return {status: 200, message: "Lấy dữ liệu đơn hàng theo id thành công", data: order};
     } catch (error) {

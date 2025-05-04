@@ -59,7 +59,6 @@ router.get("/:id", async (req,res)=>{
 
     }
 })
-
 router.get("/uniqueKey/:key", async (req,res)=>{
     try{
         const {key} = req.params;
