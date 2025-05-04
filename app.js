@@ -23,7 +23,7 @@ var voucherRouter = require('./routes/voucher');
 var commentsRouter = require('./routes/comments');
 var orderRouter = require('./routes/order');
 var orderDetailsRouter = require('./routes/odrdetails');
-var checkoutRouter = require ('./routes/checkout')
+var checkoutRouter = require('./routes/checkout');
 
 var app = express();
 
@@ -62,7 +62,7 @@ app.use('/comments', commentsRouter);
 app.use('/voucher', voucherRouter);
 app.use('/order', orderRouter);
 app.use('/orderDetails', orderDetailsRouter);
-app.use("/checkout",checkoutRouter )
+app.use("/checkout", checkoutRouter )
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

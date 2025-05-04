@@ -1,6 +1,6 @@
 var express = require("express");
 var router = express.Router();
-const {zaloPayment, handleZaloCallback} = require("../mongo/controllers/checkout");
+const {zaloPayment, handleZaloCallback} = require("../mongo/controller/checkout");
 
 router.post("/zaloPay", async function (req, res) {
     try {
