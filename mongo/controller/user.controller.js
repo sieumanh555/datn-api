@@ -264,18 +264,16 @@ async function editUser(id, token, body) {
         const updatedUser = await userModel.findByIdAndUpdate(id, updateData, {new: true});
         const access_token = jwt.sign(
             {
-                userId: updatedUser._id,
+                id: updatedUser._id,
                 role: updatedUser.role,
-                userInfo: updatedUser
             },
             config.secret_key,
             {expiresIn: "3d"}
         );
         const refresh_token = jwt.sign(
             {
-                userId: updatedUser._id,
+                id: updatedUser._id,
                 role: updatedUser.role,
-                userInfo: updatedUser
             },
             config.secret_key,
             {expiresIn: "15d"}
