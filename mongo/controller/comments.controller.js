@@ -76,7 +76,8 @@ async function insertComment(body) {
             sky_id: randomCode,
             user: {
                 userID: userFind._id,
-                name: userFind.name,
+                firstname: userFind.firstname,
+                lastname: userFind.lastname
             },
             product: {
                 productID: productFind._id,

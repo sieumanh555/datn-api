@@ -135,7 +135,8 @@ async function login(body) {
         if (matchPass) {
             const access_token = jwt.sign(
                 {
-                    userInfo: user,
+                    id: user._id,
+                    role: user.role
                 },
                 config.secret_key,
                 {expiresIn: "3d"}
@@ -143,7 +144,8 @@ async function login(body) {
 
             const refresh_token = jwt.sign(
                 {
-                    userInfo: user,
+                    id: user._id,
+                    role: user.role
                 },
                 config.secret_key,
                 {expiresIn: "15d"}
@@ -262,8 +264,8 @@ async function editUser(id, token, body) {
         const updatedUser = await userModel.findByIdAndUpdate(id, updateData, {new: true});
         const access_token = jwt.sign(
             {
-                // userId: updatedUser._id,
-                // role: updatedUser.role
+                userId: updatedUser._id,
+                role: updatedUser.role,
                 userInfo: updatedUser
             },
             config.secret_key,
@@ -271,8 +273,8 @@ async function editUser(id, token, body) {
         );
         const refresh_token = jwt.sign(
             {
-                // userId: updatedUser._id,
-                // role: updatedUser.role
+                userId: updatedUser._id,
+                role: updatedUser.role,
                 userInfo: updatedUser
             },
             config.secret_key,

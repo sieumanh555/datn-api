@@ -12,7 +12,7 @@ module.exports = async () => {
         orderDetailId: { type: ObjectId, ref: "orderDetail", required: true },
         amount: { type: Number, required: true },
         description: { type: String, required: false, default: "" },
-        voucherId: { type: ObjectId, ref: "Voucher", required: true },
+        voucherId: { type: ObjectId, ref: "Voucher", required: false, default: null },
         voucherValue: { type: Number, required: false, default: 0 },
         address: { type: String, required: true },
         paymentMethod: { type: String, required: true },
