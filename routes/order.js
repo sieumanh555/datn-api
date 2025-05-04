@@ -59,6 +59,17 @@ router.get("/:id", async (req,res)=>{
 
     }
 })
+router.delete("/:id", async (req,res)=>{
+    try{
+        const {id} = req.params;
+        const result = await orderController.deleteOrder(id);
+        return res.status(result.status).json(result);
+    } catch(error){
+        console.log("Lỗi server: ",error);
+        return res.status(500).json({status: 500, message: "Lỗi sever"});
+
+    }
+})
 router.get("/uniqueKey/:key", async (req,res)=>{
     try{
         const {key} = req.params;

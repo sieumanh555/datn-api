@@ -7,6 +7,8 @@ const orderDetailSchema = new Schema({
         {
             _id: false,
             productId: {type: ObjectId, ref: "product", required: true},
+            userId: { type: ObjectId, ref: "user", required: true },
+            orderId: { type: ObjectId, ref: "order", required: true },
             selectedColor: {type: String, required: true},
             selectedSize: {type: Number, required: true},
             quantity: {type: Number, required: true, default: 1},

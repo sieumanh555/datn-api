@@ -10,6 +10,7 @@ module.exports = {
     getAllTodayOrders,
     getAllOrderFailed,
     getTotalADay,
+    deleteOrder,
     getTotal
 };
 let orderModel;
@@ -131,7 +132,18 @@ async function getOrderByUniqueKey(uniqueKey) {
         return {status: 500, message: "Lỗi lấy dữ liệu đơn hàng theo uniqueKey"};
     }
 }
-
+async function deleteOrder(id) {
+  try {
+    const proDel = await orderModel.findByIdAndDelete(id);
+    if (!proDel) {
+      throw new Error("Không tìm thấy sản phẩm");
+    }
+    return proDel;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+}
 async function addOrder(body) {
     try {
         const {
