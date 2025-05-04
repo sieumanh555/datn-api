@@ -134,11 +134,11 @@ async function getOrderByUniqueKey(uniqueKey) {
 }
 async function deleteOrder(id) {
   try {
-    const proDel = await orderModel.findByIdAndDelete(id);
-    if (!proDel) {
-      throw new Error("Không tìm thấy sản phẩm");
+    const orderDel = await orderModel.findByIdAndDelete(id);
+    if (!orderDel) {
+      throw new Error("Không tìm thấy đơn hàng");
     }
-    return proDel;
+    return orderDel;
   } catch (error) {
     console.log(error);
     throw error;

@@ -34,8 +34,8 @@ async function addOrderDetail(items) {
         
         await orderDetail.save();
 
-        return {status: 200, message: "thêm orderDetail thành công", data: orderDetail}
+        return {status: 200, error,  message: "thêm orderDetail thành công", data: orderDetail}
     } catch (error) {
-        return {status: 500, message: "thêm orderDetail thất bại"}
+        return {status: 500, error,message: "thêm orderDetail thất bại"}
     }
 }
