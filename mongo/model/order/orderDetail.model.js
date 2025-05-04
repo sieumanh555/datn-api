@@ -5,7 +5,6 @@ const ObjectId = Schema.ObjectId;
 const orderDetailSchema = new Schema({
     items: [
         {
-            _id: false,
             productId: {type: ObjectId, ref: "product", required: true},
             // userId: { type: ObjectId, ref: "user", required: true },
             // orderId: { type: ObjectId, ref: "order", required: true },

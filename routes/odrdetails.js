@@ -25,9 +25,9 @@ router.get("/:id", async (req,res)=>{
     }
 })
 
-router.post("/", async (req, res) => {
+router.post("/", async function (req, res) {
     try {
-        const items = req.body;
+        const {items} = req.body;
         const result = await orderDetailController.addOrderDetail(items);
         return res.status(result.status).json(result);
     } catch (error) {
