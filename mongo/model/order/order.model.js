@@ -25,7 +25,7 @@ module.exports = async () => {
         shippingMethod: { type: String, required: false },
         status: {
             type: String,
-            enum: ["Processing", "Shipped", "Shipping", "Cancelled"],
+            enum: ["Processing", "Received", "Shipping", "Complete", "Cancelled"],
             default: "Processing",
         },
     }, { timestamps: true });
@@ -35,9 +35,9 @@ module.exports = async () => {
         Completed: []
     }
     const STATUS_FLOW = {
-        Processing: ["Shipped", "Cancelled"],
-        Shipped: ["Delivered"],
-        Delivered: [],
+        Processing: ["Cancelled", "Received"],
+        Received: ["Shipping"],
+        Shipping: ["Complete", "Cancelled"],
         Cancelled: []
     };
 
